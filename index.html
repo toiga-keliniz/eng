@@ -40,7 +40,8 @@
   .options {
     margin-top: 25px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    /* Изменено на 2 колонки для лучшего вида */
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
   }
   .option {
@@ -49,16 +50,31 @@
     border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    transition: background 0.25s;
+    transition: background 0.25s, transform 0.2s;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
   }
   .option:hover {
     background: #444;
+    transform: translateY(-2px);
   }
   .option.selected {
     background: #007bff;
     color: white;
     font-weight: 700;
+  }
+  /* Стили для правильного и неправильного ответа */
+  .option.correct {
+    background: #4caf50; /* Зеленый */
+    color: white;
+    font-weight: 700;
+  }
+  .option.incorrect {
+    background: #f44336; /* Красный */
+    color: white;
   }
   button {
     margin-top: 25px;
@@ -91,33 +107,32 @@
     <div class="description" id="description">Факты, привычки, расписание.</div>
 
     <div class="options" id="options">
-      <!-- Варианты формул -->
-    </div>
+      </div>
 
     <button id="checkBtn" disabled>Проверить</button>
     <div class="result" id="result"></div>
 
-    <button id="nextBtn" style="margin-top: 30px;">Следующее время</button>
+    <button id="nextBtn" style="display: none; margin-top: 15px;">Следующее время</button>
   </div>
 
 <script>
   const tenses = [
-    { name: "Present Simple", emoji: "⏰", description: "Факты, привычки, расписание.", formula: "Subject + V1 (+s/es)" },
+    { name: "Present Simple", emoji: "⏰", description: "Факты, привычки, расписание.", formula: "Subject + V1" },
     { name: "Present Continuous", emoji: "🎥", description: "Процесс прямо сейчас.", formula: "am/is/are + V-ing" },
-    { name: "Past Simple", emoji: "🖼", description: "Завершённое действие в прошлом.", formula: "Subject + V2 (+ed)" },
-    { name: "Past Continuous", emoji: "🚗", description: "Процесс в прошлом, часто прерванный другим действием.", formula: "was/were + V-ing" },
+    { name: "Past Simple", emoji: "🖼", description: "Завершённое действие в прошлом.", formula: "Subject + V2/ed" },
+    { name: "Past Continuous", emoji: "🚗", description: "Процесс в прошлом.", formula: "was/were + V-ing" },
     { name: "Past Perfect", emoji: "🏺", description: "Прошлое до прошлого.", formula: "had + V3" },
-    { name: "Present Perfect", emoji: "🌍", description: "Результат в настоящем, опыт.", formula: "have/has + V3" },
-    { name: "Present Perfect Continuous", emoji: "🎮", description: "Процесс, начавшийся в прошлом и идущий до сих пор.", formula: "have/has been + V-ing" },
-    { name: "Future Simple", emoji: "🎉", description: "Обещание, прогноз, мгновенное решение.", formula: "will + V1" },
-    { name: "Future Continuous", emoji: "🚀", description: "Будущий процесс в определённый момент.", formula: "will be + V-ing" },
-    { name: "Past Perfect Continuous", emoji: "🛩", description: "Процесс, длившийся до другого момента в прошлом.", formula: "had been + V-ing" },
-    { name: "Future Perfect", emoji: "⚰️", description: "Дедлайн, к которому действие будет завершено.", formula: "will have + V3" },
-    { name: "Future Perfect Continuous", emoji: "💼", description: "Процесс, который будет длиться до определённого момента в будущем.", formula: "will have been + V-ing" }
+    { name: "Present Perfect", emoji: "🌍", description: "Результат, опыт.", formula: "have/has + V3" },
+    { name: "Present Perfect Continuous", emoji: "🎮", description: "Процесс до сейчас.", formula: "have/has been + V-ing" },
+    { name: "Future Simple", emoji: "🎉", description: "Прогноз, решение.", formula: "will + V1" },
+    { name: "Future Continuous", emoji: "🚀", description: "Будущий процесс.", formula: "will be + V-ing" },
+    { name: "Past Perfect Continuous", emoji: "🛩", description: "Процесс до прошлого.", formula: "had been + V-ing" },
+    { name: "Future Perfect", emoji: "⚰️", description: "Дедлайн в будущем.", formula: "will have + V3" },
+    { name: "Future Perfect Continuous", emoji: "💼", description: "Процесс до будущего.", formula: "will have been + V-ing" }
   ];
 
   let currentTense = null;
-  let selectedOption = null;
+  let selectedDiv = null;
 
 const emojiEl = document.getElementById("emoji");
   const tenseNameEl = document.getElementById("tenseName");
@@ -138,21 +153,22 @@ const emojiEl = document.getElementById("emoji");
 
     while (optionsSet.size < 6) {
       const randomFormula = allFormulas[Math.floor(Math.random() * allFormulas.length)];
-      optionsSet.add(randomFormula);
+      if (randomFormula !== correctFormula) {
+        optionsSet.add(randomFormula);
+      }
     }
-
-    let optionsArray = Array.from(optionsSet);
-    optionsArray = shuffle(optionsArray);
-
-    return optionsArray;
+    return shuffle(Array.from(optionsSet));
   }
 
   function loadTense() {
-    selectedOption = null;
+    selectedDiv = null;
     checkBtn.disabled = true;
+    checkBtn.style.display = 'block';
+    nextBtn.style.display = 'none';
     resultEl.textContent = "";
     optionsEl.innerHTML = "";
-
+    
+    // Выбираем случайное время, которое еще не было
     currentTense = tenses[Math.floor(Math.random() * tenses.length)];
 
     emojiEl.textContent = currentTense.emoji;
@@ -165,33 +181,47 @@ const emojiEl = document.getElementById("emoji");
       const div = document.createElement("div");
       div.classList.add("option");
       div.textContent = opt;
+      div.dataset.formula = opt;
       div.onclick = () => {
-        // Снять выделение у всех
-        document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
-        // Выделить выбранный
-        div.classList.add("selected");
-        selectedOption = opt;
-        checkBtn.disabled = false;
-        resultEl.textContent = "";
+        if (checkBtn.disabled === false) { // Только если еще не ответили
+            document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+            div.classList.add("selected");
+            selectedDiv = div;
+            checkBtn.disabled = false;
+        }
       };
       optionsEl.appendChild(div);
     });
   }
 
   checkBtn.onclick = () => {
-    if (!selectedOption) return;
-    if (selectedOption === currentTense.formula) {
+    if (!selectedDiv) return;
+
+    const isCorrect = selectedDiv.dataset.formula === currentTense.formula;
+    
+    if (isCorrect) {
+      selectedDiv.classList.add("correct");
       resultEl.textContent = "✅ Правильно!";
       resultEl.style.color = "#4caf50";
     } else {
-      resultEl.textContent = ❌ Неправильно! Правильная формула: ${currentTense.formula};
+      selectedDiv.classList.add("incorrect");
+      resultEl.textContent = ❌ Неправильно!;
       resultEl.style.color = "#f44336";
+      // Показываем правильный ответ
+      document.querySelectorAll(".option").forEach(o => {
+        if (o.dataset.formula === currentTense.formula) {
+          o.classList.add("correct");
+        }
+      });
     }
+
+    // Блокируем дальнейшие нажатия
+    checkBtn.disabled = true; 
+    checkBtn.style.display = 'none';
+    nextBtn.style.display = 'block';
   };
 
-  nextBtn.onclick = () => {
-    loadTense();
-  };
+  nextBtn.onclick = loadTense;
 
   // Загрузить первый тест
   loadTense();
