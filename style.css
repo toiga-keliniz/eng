@@ -1,0 +1,122 @@
+```css
+/* Основные стили для темной темы */
+body {
+    font-family: -apple-system, BlinkMacMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #1a1a1a; /* Темный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    color: #e0e0e0; /* Светлый текст */
+}
+
+/* Контейнер для викторины */
+.quiz-container {
+    background-color: #2c2c2c; /* Темный фон контейнера */
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); /* Более выраженная тень */
+    padding: 30px;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+}
+
+/* Заголовок времени */
+#tense-title {
+    font-size: 2.5rem;
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #f0f0f0; /* Светлый заголовок */
+}
+
+/* Описание времени */
+#tense-description {
+    font-size: 1.1rem;
+    color: #b0b0b0; /* Светло-серый текст описания */
+    margin-bottom: 30px;
+    min-height: 60px; /* Чтобы контейнер не прыгал при смене текста */
+}
+
+.formula-section h2 {
+    font-size: 1.2rem;
+    color: #f0f0f0; /* Светлый заголовок секции */
+    margin-bottom: 15px;
+}
+
+/* Список вариантов формул */
+#formula-options {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+}
+
+#formula-options li {
+    background-color: #3a3a3a; /* Темный фон элементов списка */
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+    color: #e0e0e0; /* Светлый текст элементов списка */
+}
+
+#formula-options li:hover {
+    background-color: #4a4a4a; /* Фон при наведении */
+    border-color: #6a9ce0; /* Голубая обводка при наведении */
+}
+
+/* Стили состояний */
+#formula-options li.selected {
+    background-color: #5b8ad4; /* Голубой фон для выбранного */
+    border-color: #6a9ce0;
+    color: #ffffff; /* Белый текст для выбранного */
+}
+
+#formula-options li.correct {
+    background-color: #4CAF50 !important; /* Зеленый фон для правильного */
+    border-color: #4CAF50 !important;
+    color: #ffffff !important;
+    transform: scale(1.02);
+}
+
+#formula-options li.incorrect {
+    background-color: #dc3545 !important; /* Красный фон для неправильного */
+    border-color: #dc3545 !important;
+    color: #ffffff !important;
+    animation: shake 0.5s;
+}
+
+/* Анимация тряски для неправильного ответа */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Кнопка "Проверить" */
+#check-btn {
+    background-color: #6a9ce0; /* Голубой фон кнопки */
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s;
+}
+
+#check-btn:hover {
+    background-color: #4e80cf; /* Более темный голубой при наведении */
+}
+
+#check-btn:disabled {
+    background-color: #555555; /* Темно-серый для отключенной кнопки */
+    cursor: not-allowed;
+    color: #b0b0b0;
+}
+```
