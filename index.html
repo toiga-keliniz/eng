@@ -36,6 +36,23 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+   // --- ДАННЫЕ ТЕПЕРЬ ВНУТРИ СКРИПТА ---
+    const allTenses = [
+      { name: "Present Simple", emoji: "⏰", description: "Факты, привычки, расписание.", formula: "Subject + V1" },
+      { name: "Present Continuous", emoji: "🎥", description: "Процесс прямо сейчас.", formula: "am/is/are + V-ing" },
+      { name: "Past Simple", emoji: "🖼", description: "Завершённое действие в прошлом.", formula: "Subject + V2/ed" },
+      { name: "Past Continuous", emoji: "🚗", description: "Процесс в прошлом.", formula: "was/were + V-ing" },
+      { name: "Past Perfect", emoji: "🏺", description: "Прошлое до прошлого.", formula: "had + V3" },
+      { name: "Present Perfect", emoji: "🌍", description: "Результат, опыт.", formula: "have/has + V3" },
+      { name: "Present Perfect Continuous", emoji: "🎮", description: "Процесс до сейчас.", formula: "have/has been + V-ing" },
+      { name: "Future Simple", emoji: "🎉", description: "Прогноз, решение.", formula: "will + V1" },
+      { name: "Future Continuous", emoji: "🚀", description: "Будущий процесс.", formula: "will be + V-ing" },
+      { name: "Past Perfect Continuous", emoji: "🛩", description: "Процесс до прошлого.", formula: "had been + V-ing" },
+      { name: "Future Perfect", emoji: "⚰️", description: "Дедлайн в будущем.", formula: "will have + V3" },
+      { name: "Future Perfect Continuous", emoji: "💼", description: "Процесс до будущего.", formula: "will have been + V-ing" }
+    ];
+
+    // --- ВСЯ ОСТАЛЬНАЯ ЛОГИКА ОСТАЕТСЯ ПРЕЖНЕЙ ---
     // Получаем все элементы со страницы
     const quizContainer = document.getElementById("quiz-container");
     const emojiEl = document.getElementById("emoji");
@@ -66,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error(error);
-            quizContainer.innerHTML = <div class="error-message">Ошибка: ${error.message}</div>;
+            quizContainer.innerHTML = `<div class="error-message">Ошибка: ${error.message}</div>`;
         });
 
     function loadTense() {
@@ -80,8 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
         optionsEl.innerHTML = "";
 
         currentTense = allTenses[Math.floor(Math.random() * allTenses.length)];
-
-emojiEl.textContent = currentTense.emoji;
+
+        emojiEl.textContent = currentTense.emoji;
         tenseNameEl.textContent = currentTense.name;
         descriptionEl.textContent = currentTense.description;
 
@@ -122,7 +139,7 @@ emojiEl.textContent = currentTense.emoji;
         } else {
             selectedOptionDiv.classList.remove('selected');
             selectedOptionDiv.classList.add('incorrect');
-            resultEl.textContent = ❌ Неверно!;
+            resultEl.textContent = `❌ Неверно!`;
             resultEl.style.color = "#dc3545";
 
             Array.from(optionsEl.children).find(opt => opt.textContent === currentTense.formula)?.classList.add('correct');
@@ -150,6 +167,8 @@ emojiEl.textContent = currentTense.emoji;
         }
         return array;
     }
+      loadTense();
+
 });
 </script>
 </body>
