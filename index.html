@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tenses Formula Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 400px; text-align: center; }
+    .emoji { font-size: 40px; }
+    .description { margin-top: 10px; color: #666; }
+    input { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 5px; }
+    button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    .result { margin-top: 10px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="tenseName"></div>
+    <div class="emoji" id="tenseEmoji"></div>
+    <div class="description" id="tenseDescription"></div>
+    <input type="text" id="formulaInput" placeholder="Enter formula...">
+    <button onclick="checkAnswer()">Check</button>
+    <div class="result" id="result"></div>
+    <button onclick="nextTense()" style="margin-top: 10px;">Next</button>
+  </div>  <script>
+    const tenses = [
+      { name: "Present Simple", emoji: "⏰", description: "Факты, привычки, расписание.", formula: "Subject + V1 (+s/es)" },
+      { name: "Present Continuous", emoji: "🎥", description: "Процесс прямо сейчас.", formula: "am/is/are + V-ing" },
+      { name: "Past Simple", emoji: "🖼", description: "Завершённое действие в прошлом.", formula: "Subject + V2 (+ed)" },
+      { name: "Past Continuous", emoji: "🚗", description: "Процесс в прошлом, часто прерванный другим действием.", formula: "was/were + V-ing" },
+      { name: "Past Perfect", emoji: "🏺", description: "Прошлое до прошлого.", formula: "had + V3" },
+      { name: "Present Perfect", emoji: "🌍", description: "Результат в настоящем, опыт.", formula: "have/has + V3" },
+      { name: "Present Perfect Continuous", emoji: "🎮", description: "Процесс, начавшийся в прошлом и идущий до сих пор.", formula: "have/has been + V-ing" },
+      { name: "Future Simple", emoji: "🎉", description: "Обещание, прогноз, мгновенное решение.", formula: "will + V1" },
+      { name: "Future Continuous", emoji: "🚀", description: "Будущий процесс в определённый момент.", formula: "will be + V-ing" },
+      { name: "Past Perfect Continuous", emoji: "🛩", description: "Процесс, длившийся до другого момента в прошлом.", formula: "had been + V-ing" },
+      { name: "Future Perfect", emoji: "⚰️", description: "Дедлайн, к которому действие будет завершено.", formula: "will have + V3" },
+      { name: "Future Perfect Continuous", emoji: "💼", description: "Процесс, который будет длиться до определённого момента в будущем.", formula: "will have been + V-ing" }
+    ];
+
+    let currentTense;
+
+    function nextTense() {
+      currentTense = tenses[Math.floor(Math.random() * tenses.length)];
+      document.getElementById("tenseName").innerText = currentTense.name;
+      document.getElementById("tenseEmoji").innerText = currentTense.emoji;
+      document.getElementById("tenseDescription").innerText = currentTense.description;
+      document.getElementById("formulaInput").value = "";
+      document.getElementById("result").innerText = "";
+    }
+
+    function checkAnswer() {
+      const userInput = document.getElementById("formulaInput").value.trim();
+      if (userInput.toLowerCase() === currentTense.formula.toLowerCase()) {
+        document.getElementById("result").innerText = "✅ Correct!";
+        document.getElementById("result").style.color = "green";
+      } else {
+        document.getElementById("result").innerText = ❌ Wrong. Correct: ${currentTense.formula};
+        document.getElementById("result").style.color = "red";
+      }
+    }
+
+    nextTense();
+  </script></body>
+</html>
