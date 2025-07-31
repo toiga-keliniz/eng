@@ -3,22 +3,24 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Tenses Quiz - Dark Mode</title>
+<title>Tenses Quiz — Выбери Формулу</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
     background: #121212;
-    color: #e0e0e0;
-    margin: 0; padding: 0;
-    display: flex; justify-content: center; align-items: center;
+    color: #eee;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 100vh;
+    margin: 0;
   }
   .container {
     background: #1e1e1e;
+    padding: 25px 30px;
+    border-radius: 10px;
     width: 420px;
-    border-radius: 8px;
-    padding: 20px 30px;
-    box-shadow: 0 0 15px #000000cc;
+    box-shadow: 0 0 15px #000a;
     text-align: center;
   }
   .emoji {
@@ -36,22 +38,19 @@
     min-height: 48px;
   }
   .options {
-    margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
   }
   .option {
-    padding: 10px 16px;
     background: #2a2a2a;
-    border-radius: 6px;
+    padding: 12px 10px;
+    border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    flex-grow: 1;
-    max-width: 45%;
-    transition: background 0.3s;
-    color: #ddd;
+    transition: background 0.25s;
+    font-size: 14px;
   }
   .option:hover {
     background: #444;
@@ -59,38 +58,26 @@
   .option.selected {
     background: #007bff;
     color: white;
-  }
-  select {
-    margin-top: 25px;
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: none;
-    background: #2a2a2a;
-    color: #eee;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    font-weight: 700;
   }
   button {
-    margin-top: 20px;
-    background: #007bff;
-    border: none;
-    color: white;
-    padding: 12px 0;
+    margin-top: 25px;
     width: 100%;
+    background: #007bff;
+    color: white;
     font-size: 18px;
-    border-radius: 6px;
+    border: none;
+    padding: 14px 0;
+    border-radius: 8px;
     cursor: pointer;
+    transition: background 0.3s;
   }
   button:disabled {
     background: #555;
     cursor: not-allowed;
   }
   .result {
-    margin-top: 18px;
+    margin-top: 20px;
     font-weight: 700;
     font-size: 18px;
     min-height: 28px;
@@ -104,17 +91,13 @@
     <div class="description" id="description">Факты, привычки, расписание.</div>
 
     <div class="options" id="options">
-      <!-- Кнопки с вариантами формул -->
+      <!-- Варианты формул -->
     </div>
-
-    <select id="formulaSelect" disabled>
-      <option value="" disabled selected>Выберите формулу</option>
-    </select>
 
     <button id="checkBtn" disabled>Проверить</button>
     <div class="result" id="result"></div>
 
-    <button id="nextBtn" style="margin-top: 25px;">Следующее время</button>
+    <button id="nextBtn" style="margin-top: 30px;">Следующее время</button>
   </div>
 
 <script>
@@ -129,19 +112,17 @@
     { name: "Future Simple", emoji: "🎉", description: "Обещание, прогноз, мгновенное решение.", formula: "will + V1" },
     { name: "Future Continuous", emoji: "🚀", description: "Будущий процесс в определённый момент.", formula: "will be + V-ing" },
     { name: "Past Perfect Continuous", emoji: "🛩", description: "Процесс, длившийся до другого момента в прошлом.", formula: "had been + V-ing" },
-
-{ name: "Future Perfect", emoji: "⚰️", description: "Дедлайн, к которому действие будет завершено.", formula: "will have + V3" },
+    { name: "Future Perfect", emoji: "⚰️", description: "Дедлайн, к которому действие будет завершено.", formula: "will have + V3" },
     { name: "Future Perfect Continuous", emoji: "💼", description: "Процесс, который будет длиться до определённого момента в будущем.", formula: "will have been + V-ing" }
   ];
 
   let currentTense = null;
-  let optionsList = [];
-
-  const emojiEl = document.getElementById("emoji");
+  let selectedOption = null;
+
+const emojiEl = document.getElementById("emoji");
   const tenseNameEl = document.getElementById("tenseName");
   const descriptionEl = document.getElementById("description");
   const optionsEl = document.getElementById("options");
-  const formulaSelect = document.getElementById("formulaSelect");
   const checkBtn = document.getElementById("checkBtn");
   const resultEl = document.getElementById("result");
   const nextBtn = document.getElementById("nextBtn");
@@ -152,48 +133,54 @@
 
   function generateOptions(correctFormula) {
     const allFormulas = tenses.map(t => t.formula);
-    let set = new Set();
-    set.add(correctFormula);
+    let optionsSet = new Set();
+    optionsSet.add(correctFormula);
 
-    while (set.size < 6) {
-      const rand = allFormulas[Math.floor(Math.random() * allFormulas.length)];
-      set.add(rand);
+    while (optionsSet.size < 6) {
+      const randomFormula = allFormulas[Math.floor(Math.random() * allFormulas.length)];
+      optionsSet.add(randomFormula);
     }
-    let arr = Array.from(set);
-    arr = shuffle(arr);
-    return arr;
+
+    let optionsArray = Array.from(optionsSet);
+    optionsArray = shuffle(optionsArray);
+
+    return optionsArray;
   }
 
   function loadTense() {
+    selectedOption = null;
+    checkBtn.disabled = true;
+    resultEl.textContent = "";
+    optionsEl.innerHTML = "";
+
     currentTense = tenses[Math.floor(Math.random() * tenses.length)];
 
     emojiEl.textContent = currentTense.emoji;
     tenseNameEl.textContent = currentTense.name;
     descriptionEl.textContent = currentTense.description;
 
-    optionsList = generateOptions(currentTense.formula);
+    const options = generateOptions(currentTense.formula);
 
-    formulaSelect.innerHTML = <option value=\"\" disabled selected>Выберите формулу</option>;
-    optionsList.forEach(opt => {
-      const optionEl = document.createElement("option");
-      optionEl.value = opt;
-      optionEl.textContent = opt;
-      formulaSelect.appendChild(optionEl);
+    options.forEach(opt => {
+      const div = document.createElement("div");
+      div.classList.add("option");
+      div.textContent = opt;
+      div.onclick = () => {
+        // Снять выделение у всех
+        document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+        // Выделить выбранный
+        div.classList.add("selected");
+        selectedOption = opt;
+        checkBtn.disabled = false;
+        resultEl.textContent = "";
+      };
+      optionsEl.appendChild(div);
     });
-
-    formulaSelect.disabled = false;
-    checkBtn.disabled = true;
-    resultEl.textContent = "";
   }
 
-  formulaSelect.addEventListener("change", () => {
-    checkBtn.disabled = formulaSelect.value === "";
-    resultEl.textContent = "";
-  });
-
   checkBtn.onclick = () => {
-    const selected = formulaSelect.value;
-    if (selected === currentTense.formula) {
+    if (!selectedOption) return;
+    if (selectedOption === currentTense.formula) {
       resultEl.textContent = "✅ Правильно!";
       resultEl.style.color = "#4caf50";
     } else {
@@ -206,7 +193,7 @@
     loadTense();
   };
 
-  // Старт
+  // Загрузить первый тест
   loadTense();
 </script>
 </body>
