@@ -14,14 +14,15 @@
     align-items: center;
     height: 100vh;
     margin: 0;
+    text-align: center;
   }
   .container {
     background: #1e1e1e;
     padding: 25px 30px;
     border-radius: 10px;
-    width: 420px;
+    width: 90%;
+    max-width: 450px;
     box-shadow: 0 0 15px #000a;
-    text-align: center;
   }
   .emoji {
     font-size: 48px;
@@ -35,12 +36,11 @@
     margin-top: 10px;
     color: #bbb;
     font-size: 15px;
-    min-height: 48px;
+    min-height: 40px;
   }
   .options {
     margin-top: 25px;
     display: grid;
-    /* Изменено на 2 колонки для лучшего вида */
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
   }
@@ -66,15 +66,16 @@
     color: white;
     font-weight: 700;
   }
-  /* Стили для правильного и неправильного ответа */
   .option.correct {
     background: #4caf50; /* Зеленый */
     color: white;
-    font-weight: 700;
+    font-weight: bold;
+    border: 2px solid #fff;
   }
   .option.incorrect {
     background: #f44336; /* Красный */
     color: white;
+    opacity: 0.7;
   }
   button {
     margin-top: 25px;
@@ -103,128 +104,138 @@
 <body>
   <div class="container">
     <div class="emoji" id="emoji">⏰</div>
-    <div class="tense-name" id="tenseName">Present Simple</div>
-    <div class="description" id="description">Факты, привычки, расписание.</div>
+    <div class="tense-name" id="tenseName">Tense Name</div>
+    <div class="description" id="description">Description goes here.</div>
 
     <div class="options" id="options">
       </div>
 
     <button id="checkBtn" disabled>Проверить</button>
     <div class="result" id="result"></div>
-
-    <button id="nextBtn" style="display: none; margin-top: 15px;">Следующее время</button>
+    <button id="nextBtn" style="display: none; margin-top: 15px;">Следующее</button>
   </div>
 
 <script>
-  const tenses = [
-    { name: "Present Simple", emoji: "⏰", description: "Факты, привычки, расписание.", formula: "Subject + V1" },
-    { name: "Present Continuous", emoji: "🎥", description: "Процесс прямо сейчас.", formula: "am/is/are + V-ing" },
-    { name: "Past Simple", emoji: "🖼", description: "Завершённое действие в прошлом.", formula: "Subject + V2/ed" },
-    { name: "Past Continuous", emoji: "🚗", description: "Процесс в прошлом.", formula: "was/were + V-ing" },
-    { name: "Past Perfect", emoji: "🏺", description: "Прошлое до прошлого.", formula: "had + V3" },
-    { name: "Present Perfect", emoji: "🌍", description: "Результат, опыт.", formula: "have/has + V3" },
-    { name: "Present Perfect Continuous", emoji: "🎮", description: "Процесс до сейчас.", formula: "have/has been + V-ing" },
-    { name: "Future Simple", emoji: "🎉", description: "Прогноз, решение.", formula: "will + V1" },
-    { name: "Future Continuous", emoji: "🚀", description: "Будущий процесс.", formula: "will be + V-ing" },
-    { name: "Past Perfect Continuous", emoji: "🛩", description: "Процесс до прошлого.", formula: "had been + V-ing" },
-    { name: "Future Perfect", emoji: "⚰️", description: "Дедлайн в будущем.", formula: "will have + V3" },
-    { name: "Future Perfect Continuous", emoji: "💼", description: "Процесс до будущего.", formula: "will have been + V-ing" }
-  ];
-
-  let currentTense = null;
-  let selectedDiv = null;
+  // Весь скрипт обернут в этот обработчик, чтобы он запускался только после загрузки страницы
+  document.addEventListener('DOMContentLoaded', () => {
+    const tenses = [
+      { name: "Present Simple", emoji: "⏰", description: "Факты, привычки, расписание.", formula: "Subject + V1" },
+      { name: "Present Continuous", emoji: "🎥", description: "Процесс прямо сейчас.", formula: "am/is/are + V-ing" },
+      { name: "Past Simple", emoji: "🖼", description: "Завершённое действие в прошлом.", formula: "Subject + V2/ed" },
+      { name: "Past Continuous", emoji: "🚗", description: "Процесс в прошлом.", formula: "was/were + V-ing" },
+      { name: "Past Perfect", emoji: "🏺", description: "Прошлое до прошлого.", formula: "had + V3" },
+      { name: "Present Perfect", emoji: "🌍", description: "Результат, опыт.", formula: "have/has + V3" },
+      { name: "Present Perfect Continuous", emoji: "🎮", description: "Процесс до сейчас.", formula: "have/has been + V-ing" },
+      { name: "Future Simple", emoji: "🎉", description: "Прогноз, решение.", formula: "will + V1" },
+      { name: "Future Continuous", emoji: "🚀", description: "Будущий процесс.", formula: "will be + V-ing" },
+      { name: "Past Perfect Continuous", emoji: "🛩", description: "Процесс до прошлого.", formula: "had been + V-ing" },
+      { name: "Future Perfect", emoji: "⚰️", description: "Дедлайн в будущем.", formula: "will have + V3" },
+      { name: "Future Perfect Continuous", emoji: "💼", description: "Процесс до будущего.", formula: "will have been + V-ing" }
+    ];
 
-const emojiEl = document.getElementById("emoji");
-  const tenseNameEl = document.getElementById("tenseName");
-  const descriptionEl = document.getElementById("description");
-  const optionsEl = document.getElementById("options");
-  const checkBtn = document.getElementById("checkBtn");
-  const resultEl = document.getElementById("result");
-  const nextBtn = document.getElementById("nextBtn");
+let currentTense = null;
+    let selectedOptionDiv = null;
+    let isAnswered = false;
 
-  function shuffle(array) {
-    return array.sort(() => Math.random() - 0.5);
-  }
+    // Получаем все элементы со страницы
+    const emojiEl = document.getElementById("emoji");
+    const tenseNameEl = document.getElementById("tenseName");
+    const descriptionEl = document.getElementById("description");
+    const optionsEl = document.getElementById("options");
+    const checkBtn = document.getElementById("checkBtn");
+    const resultEl = document.getElementById("result");
+    const nextBtn = document.getElementById("nextBtn");
 
-  function generateOptions(correctFormula) {
-    const allFormulas = tenses.map(t => t.formula);
-    let optionsSet = new Set();
-    optionsSet.add(correctFormula);
-
-    while (optionsSet.size < 6) {
-      const randomFormula = allFormulas[Math.floor(Math.random() * allFormulas.length)];
-      if (randomFormula !== correctFormula) {
-        optionsSet.add(randomFormula);
-      }
-    }
-    return shuffle(Array.from(optionsSet));
-  }
-
-  function loadTense() {
-    selectedDiv = null;
-    checkBtn.disabled = true;
-    checkBtn.style.display = 'block';
-    nextBtn.style.display = 'none';
-    resultEl.textContent = "";
-    optionsEl.innerHTML = "";
-    
-    // Выбираем случайное время, которое еще не было
-    currentTense = tenses[Math.floor(Math.random() * tenses.length)];
-
-    emojiEl.textContent = currentTense.emoji;
-    tenseNameEl.textContent = currentTense.name;
-    descriptionEl.textContent = currentTense.description;
-
-    const options = generateOptions(currentTense.formula);
-
-    options.forEach(opt => {
-      const div = document.createElement("div");
-      div.classList.add("option");
-      div.textContent = opt;
-      div.dataset.formula = opt;
-      div.onclick = () => {
-        if (checkBtn.disabled === false) { // Только если еще не ответили
-            document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
-            div.classList.add("selected");
-            selectedDiv = div;
-            checkBtn.disabled = false;
+    // Надежная функция перемешивания массива
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
-      };
-      optionsEl.appendChild(div);
+        return array;
+    }
+    
+    // Более надежная функция генерации вариантов
+    function generateOptions(correctFormula) {
+        const otherFormulas = tenses
+            .map(t => t.formula)
+            .filter(f => f !== correctFormula);
+        shuffle(otherFormulas);
+        const finalOptions = [correctFormula, ...otherFormulas.slice(0, 5)];
+        return shuffle(finalOptions);
+    }
+
+    function loadTense() {
+        isAnswered = false;
+        selectedOptionDiv = null;
+
+        checkBtn.disabled = true;
+        checkBtn.style.display = 'block';
+        nextBtn.style.display = 'none';
+        resultEl.textContent = "";
+        optionsEl.innerHTML = "";
+
+        currentTense = tenses[Math.floor(Math.random() * tenses.length)];
+
+        emojiEl.textContent = currentTense.emoji;
+        tenseNameEl.textContent = currentTense.name;
+        descriptionEl.textContent = currentTense.description;
+
+        const options = generateOptions(currentTense.formula);
+
+        options.forEach(formula => {
+            const div = document.createElement("div");
+            div.classList.add("option");
+            div.textContent = formula;
+            
+            div.addEventListener('click', () => {
+                if (isAnswered) return; // Не даем выбирать после ответа
+
+                // Снимаем выделение с предыдущего
+                const currentlySelected = optionsEl.querySelector('.selected');
+                if (currentlySelected) {
+                    currentlySelected.classList.remove('selected');
+                }
+                
+                // Выделяем новый
+                div.classList.add('selected');
+                selectedOptionDiv = div;
+                checkBtn.disabled = false; // Активируем кнопку "Проверить"
+            });
+            optionsEl.appendChild(div);
+        });
+    }
+
+    checkBtn.addEventListener('click', () => {
+        if (!selectedOptionDiv) return;
+        isAnswered = true;
+
+        const isCorrect = selectedOptionDiv.textContent === currentTense.formula;
+
+        if (isCorrect) {
+            selectedOptionDiv.classList.remove('selected');
+            selectedOptionDiv.classList.add('correct');
+            resultEl.textContent = "✅ Правильно!";
+            resultEl.style.color = "#4caf50";
+        } else {
+            selectedOptionDiv.classList.remove('selected');
+            selectedOptionDiv.classList.add('incorrect');
+            resultEl.textContent = ❌ Неверно!;
+            resultEl.style.color = "#f44336";
+
+            // Находим и подсвечиваем правильный ответ
+            Array.from(optionsEl.children).find(opt => opt.textContent === currentTense.formula)?.classList.add('correct');
+        }
+
+        checkBtn.style.display = 'none';
+        nextBtn.style.display = 'block';
     });
-  }
 
-  checkBtn.onclick = () => {
-    if (!selectedDiv) return;
+    nextBtn.addEventListener('click', loadTense);
 
-    const isCorrect = selectedDiv.dataset.formula === currentTense.formula;
-    
-    if (isCorrect) {
-      selectedDiv.classList.add("correct");
-      resultEl.textContent = "✅ Правильно!";
-      resultEl.style.color = "#4caf50";
-    } else {
-      selectedDiv.classList.add("incorrect");
-      resultEl.textContent = ❌ Неправильно!;
-      resultEl.style.color = "#f44336";
-      // Показываем правильный ответ
-      document.querySelectorAll(".option").forEach(o => {
-        if (o.dataset.formula === currentTense.formula) {
-          o.classList.add("correct");
-        }
-      });
-    }
-
-    // Блокируем дальнейшие нажатия
-    checkBtn.disabled = true; 
-    checkBtn.style.display = 'none';
-    nextBtn.style.display = 'block';
-  };
-
-  nextBtn.onclick = loadTense;
-
-  // Загрузить первый тест
-  loadTense();
+    // Первый запуск
+    loadTense();
+  });
 </script>
 </body>
 </html>
